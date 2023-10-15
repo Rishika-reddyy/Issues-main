@@ -1,0 +1,184 @@
+package pages;
+
+import java.io.IOException;
+
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import com.aventstack.extentreports.ExtentTest;
+
+import base.PageBaseClass;
+import utils.Dateutil;
+import utils.ExcelRead;
+
+/*
+ * FillIssue consists all methods to fill the issues form
+ */
+
+public class FillIssue extends PageBaseClass {
+
+	public WebDriver driver;
+
+	public FillIssue(WebDriver driver, ExtentTest logger) {
+		this.driver = driver;
+		this.logger = logger;
+		PageFactory.initElements(driver, this);
+	}
+
+	/****************** WebElements ***********************/
+
+	@FindBy(xpath = "//*[@id=\"CM_ItemCodeLABEL\"]")
+	public WebElement Id;
+
+	@FindBy(xpath = "//*[@id=\"CM_ItemCode\"]")
+	public WebElement IdValue;
+
+	@FindBy(xpath = "//*[@id=\"_Text_Check_CM_Name\"]")
+	public WebElement name;
+
+	@FindBy(xpath = "//*[@id=\"CM_Description\"]")
+	public WebElement description;
+
+	@FindBy(xpath = "//*[@id=\"DN_IssueCategory\"]")
+	public WebElement issueCategory;
+
+	@FindBy(xpath = "//*[@id=\"DN_Responsibility\"]")
+	public WebElement responsibility;
+
+	@FindBy(xpath = "//*[@id=\"DN_ReportedDate\"]")
+	public WebElement reportedDate;
+
+	@FindBy(xpath = "//*[@id=\"_Text_Check_DN_ReportedBy\"]")
+	public WebElement reportedby;
+
+	@FindBy(xpath = "//*[@id=\"DN_Severity1\"]")
+	public WebElement severity;
+
+	@FindBy(xpath = "//*[@id=\"CM_Priority\"]")
+	public WebElement priority;
+
+	@FindBy(xpath = "//*[@id=\"CM_DUEDATE\"]")
+	public WebElement dueDate;
+
+	@FindBy(xpath = "//*[@id=\"SaveBtn\"]")
+	public WebElement saveButton;
+
+	@FindBy(xpath = "//*[@id=\"DN_IssueType\"]")
+	public WebElement issueType;
+
+	@FindBy(xpath = "//*[@id=\"CancelBtn\"]")
+	public WebElement returnButton;
+
+	@FindBy(xpath = "//*[@id=\"_Text_Check_DN_ReportedBy\"]")
+	public WebElement reportedBy;
+
+	/****************** Scroll to ID ***********************/
+
+	public void moveToId() {
+		scrollPage(IdValue);
+		waitforElement(IdValue);
+	}
+
+	/***************** Mandatory Field Filling Functions ***********************/
+
+	public void setName(String Name) {
+		enterText(name, Name);
+	}
+
+	public void setDescription(String Description) {
+		enterText(description, Description);
+	}
+
+	public void setIssueCategory(String IssueCategory) {
+		SelectElementInList(issueCategory, IssueCategory);
+	}
+
+	public void setResponsibility(String Responsibility) {
+		SelectElementInList(responsibility, Responsibility);
+	}
+
+	public void setSeverity(String Severity) {
+		SelectElementInList(severity, Severity);
+	}
+
+	public void setPriority(String Priority) {
+		SelectElementInList(priority, Priority);
+	}
+
+	public void setDueDate(String DueDate) {
+		dueDate.clear();
+		scrollPage(dueDate);
+		dueDate.sendKeys(DueDate);
+	}
+
+	public void setIssueType(String Issue_Type) {
+		SelectElementInList(issueType, Issue_Type);
+	}
+
+	public void setReportedBy(String Reported_By) {
+		enterText(reportedBy, Reported_By);
+	}
+
+	/****************** Save Button ***********************/
+
+	public void clickSave() {
+		elementClick(saveButton);
+	}
+
+	/****************** Return Button ***********************/
+
+	public void clickReturn() {
+		elementClick(returnButton);
+		Alert alert = driver.switchTo().alert();
+		String alertMessage = driver.switchTo().alert().getText();
+		System.out.println(alertMessage);
+		alert.dismiss();
+	}
+
+	/******************
+	 * Checking Mandatory Fields Limits and Functionality
+	 ***********************/
+
+	public void checkDescriptionLimit(String d) {
+		setDescription(d);
+		String result1 = description.getAttribute("value");
+		if (result1.equalsIgnoreCase(d)) {
+			reportPass("Only 4000 characters entered");
+		} else {
+			reportFail("More than 4000 characters entered");
+		}
+
+	}
+
+	public void checkIssueCategory(String s) throws IOException {
+		SelectElementInList(issueCategory, s);
+		String date = reportedDate.getAttribute("value");
+		if (s.equalsIgnoreCase("Internal")) {
+			if ((Dateutil.getTodayDate().equalsIgnoreCase(date))) {
+				reportPass("IssueCategory Internal verified");
+			} else {
+				reportFail("IssueCategory Internal not correct");
+			}
+		} else {
+			if (Dateutil.getTodayDate().equalsIgnoreCase(date)) {
+				reportPass("IssueCategory External verified");
+			} else {
+				reportFail("IssueCategory External not correct");
+			}
+		}
+	}
+
+	public void dueDateLimit() throws IOException {
+		utils.ExcelRead.fillForm("IssuesFormData.xlsx");
+		setName(ExcelRead.Name);
+		setDescription(ExcelRead.Description);
+		setIssueCategory(ExcelRead.IssueCategory);
+		setResponsibility(ExcelRead.Responsibility);
+		setSeverity(ExcelRead.Severity);
+		setPriority(ExcelRead.Priority);
+		setDueDate(ExcelRead.DueDateLimit1);
+	}
+}

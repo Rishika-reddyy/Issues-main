@@ -1,0 +1,232 @@
+package base;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+import utils.DriverSetup;
+import utils.ExtentReportManager;
+
+/*
+ * PageBaseClass contains basic operations of web testing 
+ */
+public class PageBaseClass {
+
+	public static WebDriver driver;
+	public static Properties prop;
+	public static ExtentReports report = ExtentReportManager.getReportInstance();
+	public static ExtentTest logger;
+	public SoftAssert softAssert = new SoftAssert();
+
+	
+	
+	/****************** Driver Setup ***********************/
+
+	static String projectPath = System.getProperty("user.dir");
+   
+	public static WebDriver getWebDriver() throws IOException {
+		String Path = System.getProperty("user.dir") + "\\src\\main\\resources\\config.properties";
+		FileInputStream file = new FileInputStream(new File(Path));
+		Properties prop = new Properties();
+		prop.load(file);
+		file.close();
+		String s = prop.getProperty("browser");
+		if (s.equalsIgnoreCase("chrome")) {
+			WebDriverManager.chromedriver().setup();
+			driver = new ChromeDriver();
+		} else if (s.equalsIgnoreCase("Firefox")) {
+			WebDriverManager.firefoxdriver().setup();
+			driver = new FirefoxDriver();
+		} else if(s.equalsIgnoreCase("Edge")) {
+			WebDriverManager.edgedriver().setup();
+			driver=new EdgeDriver();
+		}
+		driver.manage().window().maximize();
+		return driver;
+	}
+	/*******Setting the Property File******/
+	public static Properties setProperties() throws IOException {
+		String Path = System.getProperty("user.dir") + "\\src\\main\\resources\\config.properties";
+		FileInputStream file = new FileInputStream(new File(Path));
+		Properties prop = new Properties();
+		prop.load(file);
+		return prop;
+	}
+	/******Opening URL******/
+	public static void openUrl() throws IOException, InterruptedException {
+		Properties prop = DriverSetup.setProperties();
+		driver.get(prop.getProperty("URL"));
+	}
+	
+    /******Close the Browser******/
+	public static void closeDriver() {
+		driver.close();
+		logger.log(Status.PASS, "Driver CLosed");
+		logger.log(Status.PASS, "Report FLushed");
+	}
+	
+	/****************** Implicit Time Wait ***********************/
+	
+	public void implicitTimewait(int time)
+	{
+		driver.manage().timeouts().implicitlyWait(time, TimeUnit.SECONDS);
+	}
+	
+	/******************* Cursor Moving Action ***********************/
+		public void moveCursor(WebElement element) {
+			Actions action = new Actions(driver);
+			action.moveToElement(element).perform();
+			logger.log(Status.PASS, "Cursor successfully moved to " + element.getText());
+		}
+
+		/****************** WebDriver Wait ***********************/
+		public void waitforElement(WebElement element) {
+			WebDriverWait wait = new WebDriverWait(driver, 20);
+			wait.until(ExpectedConditions.visibilityOf(element));
+		}
+		
+		/****************** WebDriver Wait Title ***********************/
+		
+		public void waitForElementTitle(String ExpectedTitle) {
+			WebDriverWait wait = new WebDriverWait(driver, 20);
+			wait.until(ExpectedConditions.titleIs(ExpectedTitle));
+		}
+
+		/***************** Clicking Element***********************/
+		public void elementClick(WebElement element) {
+
+			try {
+				Thread.sleep(2000);
+				String Elementtext = element.getText();
+				if(Elementtext!=""&&Elementtext!=null)
+					reportPass(Elementtext + " : Element Clicked Successfully");
+				element.click();
+			} catch (Exception e) {
+				reportFail(e.getMessage());
+			}
+		}
+		
+		/****************** Send Keys***********************/
+		public void enterText(WebElement element, String data) {
+			try {
+				element.clear();
+				element.sendKeys(data);
+				reportPass(data + " - Entered successfully");
+			} catch (Exception e) {
+				reportFail(e.getMessage());
+			}
+		}
+
+		/****************** Select from list of options ***********************/
+		
+		public void SelectElementInList(WebElement element, String Value) {
+			
+			boolean flag = false;
+
+			try{
+			Select select = new Select(element);
+			select.selectByVisibleText(Value);
+			logger.log(Status.PASS, "Selected the Value : " + Value);
+			flag=true;
+			}catch(Exception e) {
+			     e.printStackTrace();
+			}
+			if (flag == false) {
+				reportFail("Value not displayed : " + Value);
+			}
+
+		}
+		
+		/****************** Get ELements in List ***********************/
+		
+		public List<String> GetElementsInList(WebElement element) {
+			Select select = new Select(element);
+			List<WebElement> list = select.getOptions();
+			List<String> result = new ArrayList<String>();
+			for(WebElement listItem : list) {
+				result.add(listItem.getText());
+			}
+			System.out.println(result);
+			return result;
+		}
+
+		/****************** Scroll to Element ***********************/
+		
+		public void scrollPage(WebElement element) {
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			js.executeScript("arguments[0].scrollIntoView();", element);
+		}
+		
+		/****************** Return Logger to Step Definition ***********************/
+		
+		public ExtentTest returnLogger() {
+			report=ExtentReportManager.getReportInstance();
+			return logger;
+		}
+
+		/****************** Get Title***********************/
+		public void getTitle(String expectedTitle) {
+
+			try {
+				Assert.assertEquals(driver.getTitle(), expectedTitle);
+				reportPass("Actual Title : " + driver.getTitle() + " - equals to Expected Title : " + expectedTitle);
+			} catch (Exception e) {
+				reportFail(e.getMessage());
+			}
+
+		}
+
+		/****************** Assertion Functions ***********************/
+		public void assertTrue(boolean flag) {
+			softAssert.assertTrue(flag);
+		}
+
+		public void assertfalse(boolean flag) {
+			softAssert.assertFalse(flag);
+		}
+
+		public void assertequals(String actual, String expected) {
+			try {
+				logger.log(Status.INFO, "Assertion : Actual is -" + actual + " And Expacted is - " + expected);
+				softAssert.assertEquals(actual, expected);
+			} catch (Exception e) {
+				reportFail(e.getMessage());
+			}
+
+		}
+
+		/****************** Reporting Functions ***********************/
+		public void reportFail(String reportString) {
+			logger.log(Status.FAIL, reportString);
+			Assert.fail(reportString);
+		}
+		
+
+		public void reportPass(String reportString) {
+			logger.log(Status.PASS, reportString);
+		}
+
+
+}

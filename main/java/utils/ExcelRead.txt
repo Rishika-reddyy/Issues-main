@@ -1,0 +1,80 @@
+package utils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+/*
+ * Reading Data from Excel
+ */
+
+public class ExcelRead {
+
+	static String projectPath = System.getProperty("user.dir");
+	static XSSFWorkbook wb;
+	static HSSFWorkbook hb;
+	public static String Name = null;
+	public static String Description = null;
+	public static String IssueCategory = null;
+	public static String Responsibility = null;
+	public static String Severity = null;
+	public static String Priority = null;
+	public static String DueDate = null;
+	public static String DescriptionLimit = null;
+	public static String DueDateLimit1 = null;
+	public static String DueDateLimit2 = null;
+	
+	public static void fillForm(String fileName) throws IOException {
+
+		if (fileName.endsWith(".xlsx")) {
+
+			// Locate the excel sheet to read the data
+			String filePath = "\\src\\main\\resources\\" + fileName;
+			File src = new File(projectPath + filePath);
+			FileInputStream file = new FileInputStream(src);
+			wb = new XSSFWorkbook(file);
+			XSSFSheet sheet = wb.getSheet("Issues");
+
+			// Read the data from excel sheet
+			Name = sheet.getRow(1).getCell(0).getStringCellValue();
+			Description = sheet.getRow(1).getCell(1).getStringCellValue();
+			IssueCategory = sheet.getRow(1).getCell(2).getStringCellValue();
+			Responsibility = sheet.getRow(1).getCell(3).getStringCellValue();
+			Severity = sheet.getRow(1).getCell(4).getStringCellValue();
+			Priority = sheet.getRow(1).getCell(5).getStringCellValue();
+			DueDate = sheet.getRow(1).getCell(6).getStringCellValue();
+			DescriptionLimit=sheet.getRow(1).getCell(7).getStringCellValue();
+			DueDateLimit1=sheet.getRow(1).getCell(8).getStringCellValue();
+			DueDateLimit2=sheet.getRow(1).getCell(9).getStringCellValue();
+		}
+		
+		else if (fileName.endsWith(".xls")) {
+
+			// Locate the excel sheet to read the data
+			String filePath = "\\Resources\\" + fileName;
+			File src = new File(projectPath + filePath);
+			FileInputStream file = new FileInputStream(src);
+			hb = new HSSFWorkbook(file);
+			HSSFSheet sheet = hb.getSheet("Issues");
+
+			// Read the data from excel sheet
+			Name = sheet.getRow(1).getCell(0).getStringCellValue();
+			Description = sheet.getRow(1).getCell(1).getStringCellValue();
+			IssueCategory = sheet.getRow(1).getCell(2).getStringCellValue();
+			Responsibility = sheet.getRow(1).getCell(3).getStringCellValue();
+			Severity = sheet.getRow(1).getCell(4).getStringCellValue();
+			Priority = sheet.getRow(1).getCell(5).getStringCellValue();
+			DueDate = sheet.getRow(1).getCell(6).getStringCellValue();
+			DescriptionLimit=sheet.getRow(1).getCell(7).getStringCellValue();
+			DueDateLimit1=sheet.getRow(1).getCell(8).getStringCellValue();
+			DueDateLimit2=sheet.getRow(1).getCell(9).getStringCellValue();
+		}
+		
+	}
+
+}

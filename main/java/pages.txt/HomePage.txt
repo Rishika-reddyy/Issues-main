@@ -1,0 +1,60 @@
+package pages;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import com.aventstack.extentreports.ExtentTest;
+
+import base.PageBaseClass;
+
+/*
+ * HomePage handles user and navigates to Issue page
+ */
+
+public class HomePage extends PageBaseClass {
+	
+	public WebDriver driver;
+	
+	public HomePage(WebDriver driver,ExtentTest logger) {
+		this.driver = driver;
+		this.logger=logger;
+		PageFactory.initElements(driver, this);
+	}
+	
+	/******Web Elements******/
+	
+	@FindBy(xpath="//*[@id=\"i0116\"]")
+	public WebElement email;
+	
+	@FindBy(xpath="//*[@id=\"idSIButton9\"]")
+	public WebElement next;
+	
+	@FindBy(xpath="//*[@id=\"i0118\"]")
+	public WebElement password;
+	
+	@FindBy(xpath="//*[@id=\"idSIButton9\"]")
+	public WebElement signIn;
+	
+	@FindBy(xpath="/html/body/div[1]/div[1]/header/nav/div/div/div[3]/div[1]/span")
+	public WebElement HamburgerMenu;
+	
+	@FindBy(xpath="//*[@id=\"projectIcon\"]/ul/li[1]/a")
+	public WebElement project;
+	
+	
+	/******Hover to Hamburger Menu Icon******/
+	
+	public void navToHamburger() {
+		moveCursor(HamburgerMenu);
+		implicitTimewait(30);
+	}
+	
+	/******Clicking CFO_Onsite******/
+	
+	public void clickCFO() {
+		elementClick(project);
+	}
+	
+}

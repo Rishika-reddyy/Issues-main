@@ -1,0 +1,44 @@
+package pages;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import com.aventstack.extentreports.ExtentTest;
+
+import base.PageBaseClass;
+
+/*
+ * Navigates user from Home page to issues page
+ */
+
+public class IssuesPage extends PageBaseClass {
+
+	public WebDriver driver;
+	
+	public IssuesPage(WebDriver driver, ExtentTest logger){
+		this.driver = driver;
+		this.logger=logger;
+		PageFactory.initElements(driver, this);
+	}
+	
+	/******Web Elements******/
+	
+	@FindBy(xpath="//*[@id=\"LOCK_Monitor\"]")
+	public WebElement monitor;
+	
+	@FindBy(xpath="//*[@id=\"LOCK_Issues\"]")
+	public WebElement issues;
+	
+	/******Hover to Monitor icon******/
+	public void navToMonitor() {
+		moveCursor(monitor);
+	}
+	
+	/******Click on Issues Module******/
+	public void clickIssues() {
+		elementClick(issues);
+	}
+	
+}
