@@ -18,17 +18,6 @@ Detailed Description:
 5. Fill the Issues form with all Valid Details and Saving it
 6. Fill the Issues form with a missing mandatory field and capture the alert
 
-**********************************************************************************************************
-
-Cohort: INTQEA21SD006 
-Team: Team 5
-Team Members: 
-
-1)	920618	AnnamTejasree
-2)	918275	Immadisetty Akhilandeswari
-3)	919269	Naveen Prasath 
-4)	920713	Rishika Reddy
-5)	919036	Tungala Usha Rani
 
 **********************************************************************************************************
 ----------------------------------------------------------------------------------------------------------
